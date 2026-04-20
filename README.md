@@ -1,23 +1,24 @@
-# Sistem Monitorizare Stocuri - proiect POO (varianta simpla)
+# Sistem monitorizare stocuri
 
-Proiect C++ foarte simplu pentru gestionarea stocurilor dintr-un depozit.
+Tema POO facuta simplu, pentru incepator.
 
-## Ce contine
-- Clasa de baza `Entitate`
-- Clasa derivata `Produs`
-- Clasa `Depozit` care foloseste `std::map<int, Produs>`
-- Operatori supraincarcati `+=` si `-=` pentru cantitate
-- Excepții simple pentru ID duplicat si ID inexistent
-- Raport pentru produse sub pragul de alerta
+## Ce am implementat
+- clasa de baza Entitate (are id)
+- clasa Produs (mosteneste Entitate)
+- clasa Depozit cu map<int, Produs>
+- operatii de baza: adaugare produs si eliminare produs
+- afisare produse din depozit
+
+Aceasta este varianta partiala (de baza).
 
 ## Fisiere
-- `docs/analiza_tema.md` - analiza cerintelor + diagrama UML simpla
-- `main.cpp` - implementare minima rulabila
+- main.cpp
+- docs/analiza_tema.md
 
-## Cum rulezi (PowerShell)
+## Compilare si rulare (PowerShell)
 ```powershell
-g++ .\main.cpp -std=c++17 -Wall -Wextra -o depozit
+g++ .\main.cpp -std=c++17 -o depozit
 .\depozit.exe
 ```
 
-Daca nu ai `g++`, poti folosi compilatorul din IDE-ul tau (Visual Studio / Code::Blocks / Dev-C++).
+Daca nu merge comanda g++, inseamna ca nu ai compilator instalat.

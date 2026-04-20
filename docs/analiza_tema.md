@@ -1,109 +1,54 @@
-# Analiza tema - Sistem de Monitorizare a Stocurilor
+# Analiza tema - Sistem de monitorizare a stocurilor
 
-## 1. Intelegere cerinte (pe scurt)
-Aplicatia trebuie sa urmareasca produsele dintr-un depozit:
-- fiecare produs are date de baza (ID, nume, cantitate, pret, prag alerta)
-- depozitul tine o colectie de produse intr-un container STL
-- se pot face operatii de adaugare, eliminare si actualizare stoc
-- se genereaza raport cu produsele care au stoc sub prag
+## 1. Ce cere tema
+Trebuie sa fac un program simplu pentru depozit:
+- tin produse in memorie
+- fiecare produs are id, nume, cantitate, pret
+- pot adauga produs
+- pot elimina produs
+- pot afisa lista de produse
 
-## 2. Clase propuse
+## 2. Clasele
 
-### Clasa de baza: Entitate
-Responsabilitate:
-- pastreaza ID-ul comun pentru obiecte
+### Entitate
+- are doar id
 
-Atribute:
-- `id: int`
+### Produs (mosteneste Entitate)
+- nume
+- cantitate
+- pret
 
-Metode:
-- constructor
-- `getId()`
+### Depozit
+- are map<int, Produs>
+- adauga produs
+- elimina produs
+- afiseaza produse
 
-### Clasa derivata: Produs (mostenire din Entitate)
-Responsabilitate:
-- modeleaza un produs din depozit
+## 3. Observatii
+- in aceasta varianta partiala nu folosesc exceptii
+- in aceasta varianta partiala nu folosesc operatori supraincarcati
 
-Atribute:
-- `nume: string`
-- `cantitate: int`
-- `pret: double`
-- `pragAlerta: int`
-
-Metode:
-- constructor
-- getteri
-- `operator+=(int)` pentru restock
-- `operator-=(int)` pentru vanzare
-- `esteSubPrag()`
-
-### Clasa Depozit
-Responsabilitate:
-- gestioneaza colectia de produse
-
-Container STL:
-- `map<int, Produs> produse`
-
-Metode:
-- `adaugaProdus(const Produs&)`
-- `eliminaProdus(int id)`
-- `actualizeazaCantitate(int id, int delta)`
-- `raportSubPrag() const`
-- `afiseazaToate() const`
-
-## 3. Excepții
-- `LocOcupatException`: la adaugare cu ID deja existent
-- `IndexInvalidException`: la acces/eliminare ID inexistent
-- `invalid_argument`: la cantitati negative sau operatii invalide
-
-## 4. Diagrama UML simpla
+## 4. UML simplu
 ```text
-+------------------+
-|     Entitate     |
-+------------------+
-| - id: int        |
-+------------------+
-| + getId(): int   |
-+------------------+
-          ^
-          |
-+------------------------------+
-|            Produs            |
-+------------------------------+
-| - nume: string               |
-| - cantitate: int             |
-| - pret: double               |
-| - pragAlerta: int            |
-+------------------------------+
-| + operator+=(int): Produs&   |
-| + operator-=(int): Produs&   |
-| + esteSubPrag(): bool        |
-+------------------------------+
+Entitate
+ - id: int
 
-+----------------------------------------+
-|                 Depozit                |
-+----------------------------------------+
-| - produse: map<int, Produs>            |
-+----------------------------------------+
-| + adaugaProdus(p: Produs): void        |
-| + eliminaProdus(id: int): void         |
-| + actualizeazaCantitate(id, delta):void|
-| + raportSubPrag(): vector<Produs>      |
-+----------------------------------------+
+Produs : Entitate
+ - nume: string
+ - cantitate: int
+ - pret: double
+
+Depozit
+ - produse: map<int, Produs>
+ + adaugaProdus(...)
+ + eliminaProdus(...)
+ + afisareToate()
 ```
 
-## 5. Discutie erori comune (student incepator)
-- Confuzie intre `map` si `vector`:
-  in `map`, cauti dupa cheie (`id`), nu dupa pozitie.
-- Uitarea validarii cantitatii:
-  nu trebuie sa existe cantitate negativa.
-- Lipsa tratarii exceptiilor:
-  daca ID-ul nu exista, programul nu trebuie sa crape fara mesaj.
-- Folosirea `operator[]` pe `map` la citire:
-  acesta poate crea element nou; la cautare e mai sigur `find`.
-- Delta interpretata gresit:
-  `delta > 0` inseamna restock, `delta < 0` inseamna vanzare.
+## 5. Erori comune
+- id duplicat la adaugare
+- id inexistent la stergere
 
-## 6. Stadiu livrabil
-- Documentatie initiala: gata (acest fisier)
-- Cod partial rulabil: in `main.cpp`
+## 6. Livrabil
+- documentatie: fisierul acesta
+- cod partial rulabil (varianta de baza): main.cpp

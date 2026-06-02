@@ -1,12 +1,10 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <climits>
 #include <windows.h>
 
-// Atribute culoare (fg = foreground, bg = background)
-// Valori directe compatibile cu SetConsoleTextAttribute
 namespace C {
-    // Foreground
     const WORD NEGRU      = 0;
     const WORD ALBASTRU   = 1;
     const WORD VERDE_I    = 2;
@@ -21,7 +19,6 @@ namespace C {
     const WORD GALBEN     = 14;
     const WORD ALB        = 15;
 
-    // Combinatii bg*16 + fg
     const WORD SEL        = 0x70; // negru pe gri (selectat in meniu)
     const WORD TITLU_BG   = 0x30; // negru pe cyan inchis
     const WORD NORMAL     = 0x07; // gri pe negru (default)
@@ -36,27 +33,34 @@ public:
     static COORD pozCursor();
     static void ascundeCursor();
     static void arataCursor();
+    static int  larimeConsola();
 
     // Output colorat
-    static void scrie     (const std::string& s, WORD attr);
-    static void scrieLn   (const std::string& s, WORD attr);
-    static void scrieOK   (const std::string& s); // verde
-    static void scrieEroare(const std::string& s); // rosu
-    static void scrieAtentie(const std::string& s); // galben
-    static void scrieInfo (const std::string& s); // cyan
+    static void scrie      (const std::string& s, WORD attr);
+    static void scrieLn    (const std::string& s, WORD attr);
+    static void scrieOK    (const std::string& s);
+    static void scrieEroare(const std::string& s);
+    static void scrieAtentie(const std::string& s);
+    static void scrieInfo  (const std::string& s);
 
-    // Elemente vizuale
-    static void titlu(const std::string& text, int latime = 60);
-    static void linie(int latime = 60);
+    // Elemente vizuale (latime = -1 → latimea terminalului)
+    static void titlu(const std::string& text, int latime = -1);
+    static void linie(int latime = -1);
 
     // Sunete
     static void sunetStart();
     static void sunetOK();
     static void sunetEroare();
 
-    // Meniu navigabil cu sageti + cifre directe
-    // optiuni ex: {"[1] Gestionare produse", "[2] Intrare", "[0] Iesire"}
-    // Returneaza index-ul ales (0-based)
+    // Input helpers cu validare si recuperare la fail
+    static int         readInt   (const std::string& prompt,
+                                  int    minVal = INT_MIN, int    maxVal = INT_MAX);
+    static double      readDouble(const std::string& prompt,
+                                  double minVal = -1e18,  double maxVal =  1e18);
+    static std::string readString(const std::string& prompt);
+    static bool        confirma  (const std::string& prompt);
+
+    // Meniu navigabil: sageti + cifre directe + mouse (hover/click/scroll)
     static int meniu(const std::vector<std::string>& optiuni);
 
 private:

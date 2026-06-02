@@ -106,7 +106,11 @@ void UI::dashboard() const {
         std::cout << "\n";
         Consola::reset();
     }
-    if (!ui && !ue) Consola::culoare(C::GRI_I), std::cout << "  (nicio tranzactie)\n", Consola::reset();
+    if (!ui && !ue) {
+        Consola::culoare(C::GRI_I);
+        std::cout << "  (nicio tranzactie)\n";
+        Consola::reset();
+    }
     std::cout << "\n";
 }
 
@@ -114,23 +118,17 @@ void UI::dashboard() const {
 
 int UI::alegereProdus() const {
     afisareTabelToate();
-    std::cout << "\n  ID produs: ";
-    int id; std::cin >> id;
-    return id;
+    return Consola::readInt("ID produs: ");
 }
 
 int UI::alegereSofer() const {
     depozit.afisareSoferi();
-    std::cout << "\n  ID sofer: ";
-    int id; std::cin >> id;
-    return id;
+    return Consola::readInt("ID sofer: ");
 }
 
 int UI::alegeVehicul() const {
     depozit.afisareVehicule();
-    std::cout << "\n  ID vehicul: ";
-    int id; std::cin >> id;
-    return id;
+    return Consola::readInt("ID vehicul: ");
 }
 
 Produs* UI::introduceProdus() {
@@ -139,74 +137,66 @@ Produs* UI::introduceProdus() {
     };
     Consola::scrieInfo("Selecteaza tipul produsului:");
     int tip = Consola::meniu(tipuri);
-    std::cin.ignore();
+    std::cout << "\n";
 
-    int id = depozit.getNextProdusId();
-    std::cout << "  Nume: ";           std::string n; std::getline(std::cin, n);
-    std::cout << "  Cantitate: ";      int c; std::cin >> c;
-    std::cout << "  Pret (RON): ";     double p; std::cin >> p;
-    std::cout << "  Prag alerta: ";    int pr; std::cin >> pr;
-    std::cin.ignore();
-    std::cout << "  Locatie (A-03-12): "; std::string loc; std::getline(std::cin, loc);
+    int id          = depozit.getNextProdusId();
+    std::string n   = Consola::readString("Nume: ");
+    int c           = Consola::readInt   ("Cantitate: ", 0);
+    double p        = Consola::readDouble("Pret (RON): ", 0.0);
+    int pr          = Consola::readInt   ("Prag alerta: ", 0);
+    std::string loc = Consola::readString("Locatie (ex: A-03-12, Enter=N/A): ");
     if (loc.empty()) loc = "N/A";
 
     if (tip == 1) { // Perisabil
-        std::cout << "  Data expirare (YYYY-MM-DD): ";
-        std::string data; std::getline(std::cin, data);
-        std::cout << "  Temperatura stocare (C): ";
-        double temp; std::cin >> temp;
+        std::string data = Consola::readString("Data expirare (YYYY-MM-DD): ");
+        double temp      = Consola::readDouble("Temperatura stocare (C): ", -50.0, 200.0);
         return new ProdusPerisabil(id, n, c, p, pr, loc, data, temp);
     }
     if (tip == 2) { // Electronic
-        std::cout << "  Numar serie: "; std::string s; std::getline(std::cin, s);
-        std::cout << "  Garantie (luni): "; int g; std::cin >> g;
-        std::cout << "  Voltaj (V, ex: 220): "; double v; std::cin >> v;
+        std::string s = Consola::readString("Numar serie: ");
+        int g         = Consola::readInt   ("Garantie (luni): ", 0);
+        double v      = Consola::readDouble("Voltaj (V, ex: 220): ", 0.0, 600.0);
         return new ProdusElectronic(id, n, c, p, pr, loc, s, g, v);
     }
     if (tip == 3) { // ISBN
-        std::cout << "  ISBN (13 cifre): "; std::string isbn; std::getline(std::cin, isbn);
-        std::cout << "  Autor: ";           std::string a; std::getline(std::cin, a);
-        std::cout << "  Editura: ";         std::string e; std::getline(std::cin, e);
-        std::cout << "  An publicare: ";    int an; std::cin >> an;
+        std::string isbn = Consola::readString("ISBN (13 cifre): ");
+        std::string a    = Consola::readString("Autor: ");
+        std::string e    = Consola::readString("Editura: ");
+        int an           = Consola::readInt   ("An publicare: ", 1000, 2100);
         return new ProdusISBN(id, n, c, p, pr, loc, isbn, a, e, an);
     }
-    return new Produs(id, n, c, p, pr, loc);
+    return new Produs(id, n, c, p, pr, loc); // tip == 0 → Generic
 }
 
 Sofer* UI::introduceSofer() {
-    int id = depozit.getNextSoferId();
-    std::cin.ignore();
-    std::cout << "  Nume: ";            std::string n; std::getline(std::cin, n);
-    std::cout << "  Nr. permis: ";      std::string pm; std::getline(std::cin, pm);
-    std::cout << "  Categorie (B/C/CE): "; std::string cat; std::getline(std::cin, cat);
+    int id          = depozit.getNextSoferId();
+    std::string n   = Consola::readString("Nume: ");
+    std::string pm  = Consola::readString("Nr. permis: ");
+    std::string cat = Consola::readString("Categorie (B/C/CE): ");
     return new Sofer(id, n, pm, cat);
 }
 
 Vehicul* UI::introduceVehicul() {
-    int id = depozit.getNextVehiculId();
-    std::cin.ignore();
-    std::cout << "  Nr. inmatriculare: "; std::string nr; std::getline(std::cin, nr);
-    std::cout << "  Capacitate (kg): ";   double cap; std::cin >> cap;
-    std::cin.ignore();
-    std::cout << "  Tip (camion/utilitara/furgoneta): "; std::string tip; std::getline(std::cin, tip);
+    int id          = depozit.getNextVehiculId();
+    std::string nr  = Consola::readString("Nr. inmatriculare: ");
+    double cap      = Consola::readDouble("Capacitate (kg): ", 0.0, 100000.0);
+    std::string tip = Consola::readString("Tip (camion/utilitara/furgoneta): ");
     return new Vehicul(id, nr, cap, tip);
 }
 
 StaffDepozit* UI::introduceStaff() {
-    int id = depozit.getNextStaffId();
-    std::cin.ignore();
-    std::cout << "  Nume: ";     std::string n; std::getline(std::cin, n);
-    std::cout << "  Rol (manager/operator/supervisor): "; std::string r; std::getline(std::cin, r);
-    std::cout << "  Username: "; std::string u; std::getline(std::cin, u);
+    int id        = depozit.getNextStaffId();
+    std::string n = Consola::readString("Nume: ");
+    std::string r = Consola::readString("Rol (manager/operator/supervisor): ");
+    std::string u = Consola::readString("Username: ");
     return new StaffDepozit(id, n, r, u);
 }
 
 Furnizor* UI::introduceFurnizor() {
-    int id = depozit.getNextFurnizorId();
-    std::cin.ignore();
-    std::cout << "  Nume furnizor: ";       std::string n; std::getline(std::cin, n);
-    std::cout << "  Contact (tel/email): "; std::string c; std::getline(std::cin, c);
-    std::cout << "  Adresa: ";              std::string a; std::getline(std::cin, a);
+    int id        = depozit.getNextFurnizorId();
+    std::string n = Consola::readString("Nume furnizor: ");
+    std::string c = Consola::readString("Contact (tel/email): ");
+    std::string a = Consola::readString("Adresa: ");
     return new Furnizor(id, n, c, a);
 }
 
@@ -236,34 +226,25 @@ void UI::menuProduse() {
                 Consola::titlu("TOATE PRODUSELE");
                 afisareTabelToate();
             } else if (idx == 1) {
-                std::cin.ignore();
-                Consola::scrieInfo("Cauta (ID / cuvant / ISBN / serie / locatie): ");
-                std::string q; std::getline(std::cin, q);
+                std::string q = Consola::readString("Cauta (ID / cuvant / ISBN / serie / locatie): ");
                 auto rez = depozit.cauta(q);
                 Consola::titlu("REZULTATE: \"" + q + "\"");
                 afisareTabelProduse(rez);
-                std::cout << "\n  "; Consola::scrie(std::to_string(rez.size()) + " rezultat(e)", C::CYAN);
+                std::cout << "\n  ";
+                Consola::scrie(std::to_string(rez.size()) + " rezultat(e)", C::CYAN);
                 std::cout << "\n";
             } else if (idx == 2) {
-                std::cin.ignore();
-                Consola::scrieInfo("Termen cautare (partial): ");
-                std::string q; std::getline(std::cin, q);
+                std::string q = Consola::readString("Termen cautare (partial): ");
                 afisareTabelProduse(depozit.cautaDupaNume(q));
             } else if (idx == 3) {
-                std::cin.ignore();
-                Consola::scrieInfo("ISBN (13 cifre): ");
-                std::string isbn; std::getline(std::cin, isbn);
+                std::string isbn = Consola::readString("ISBN (13 cifre): ");
                 Consola::titlu("REZULTAT ISBN");
                 afisareTabelProduse({depozit.cautaDupaISBN(isbn)});
             } else if (idx == 4) {
-                std::cin.ignore();
-                Consola::scrieInfo("Numar serie: ");
-                std::string serie; std::getline(std::cin, serie);
+                std::string serie = Consola::readString("Numar serie: ");
                 afisareTabelProduse({depozit.cautaDupaSerie(serie)});
             } else if (idx == 5) {
-                std::cin.ignore();
-                Consola::scrieInfo("Locatie (ex: A-03-12): ");
-                std::string loc; std::getline(std::cin, loc);
+                std::string loc = Consola::readString("Locatie (ex: A-03-12): ");
                 afisareTabelProduse(depozit.cautaDupaLocatie(loc));
             } else if (idx == 6) {
                 Consola::titlu("ADAUGA PRODUS");
@@ -273,11 +254,16 @@ void UI::menuProduse() {
                 Consola::scrieOK("Produs adaugat cu ID " + std::to_string(p->getId()));
                 FileManager::salveazaStoc(depozit);
             } else if (idx == 7) {
-                std::cout << "  ID produs de eliminat: "; int id; std::cin >> id;
-                depozit.eliminaProdus(id);
-                Consola::sunetOK();
-                Consola::scrieOK("Produs eliminat.");
-                FileManager::salveazaStoc(depozit);
+                int id = Consola::readInt("ID produs de eliminat: ");
+                if (Consola::confirma("Confirma stergerea produsului ID " +
+                                      std::to_string(id) + "?")) {
+                    depozit.eliminaProdus(id);
+                    Consola::sunetOK();
+                    Consola::scrieOK("Produs eliminat.");
+                    FileManager::salveazaStoc(depozit);
+                } else {
+                    Consola::scrieInfo("Operatiune anulata.");
+                }
             } else {
                 activ = false; continue;
             }
@@ -297,11 +283,17 @@ void UI::menuIntrareMarfa() {
     try {
         Consola::scrieInfo("--- Selecteaza produs ---");
         std::cout << "\n";
-        int pid = alegereProdus();
-        std::cout << "\n  Cantitate intrata: "; int cant; std::cin >> cant;
-        std::cout << "\n"; Consola::scrieInfo("--- Selecteaza sofer ---"); std::cout << "\n";
+        int pid  = alegereProdus();
+        int cant = Consola::readInt("Cantitate intrata: ", 1);
+
+        std::cout << "\n";
+        Consola::scrieInfo("--- Selecteaza sofer ---");
+        std::cout << "\n";
         int sid = alegereSofer();
-        std::cout << "\n"; Consola::scrieInfo("--- Selecteaza vehicul ---"); std::cout << "\n";
+
+        std::cout << "\n";
+        Consola::scrieInfo("--- Selecteaza vehicul ---");
+        std::cout << "\n";
         int vid = alegeVehicul();
 
         depozit.intrareMarfa(pid, cant, sid, vid);
@@ -329,23 +321,28 @@ void UI::menuIesireMarfa() {
         std::cout << "\n";
         int mod = Consola::meniu(moduri);
 
-        std::cout << "\n"; Consola::scrieInfo("--- Selecteaza sofer ---"); std::cout << "\n";
+        std::cout << "\n";
+        Consola::scrieInfo("--- Selecteaza sofer ---");
+        std::cout << "\n";
         int sid = alegereSofer();
-        std::cout << "\n"; Consola::scrieInfo("--- Selecteaza vehicul ---"); std::cout << "\n";
+
+        std::cout << "\n";
+        Consola::scrieInfo("--- Selecteaza vehicul ---");
+        std::cout << "\n";
         int vid = alegeVehicul();
-        std::cin.ignore();
-        std::cout << "  Destinatie (Enter pt a sari): ";
-        std::string dest; std::getline(std::cin, dest);
+
+        std::string dest = Consola::readString("Destinatie (Enter pt a sari): ");
 
         if (mod == 0) { // Normal
-            std::cout << "\n"; Consola::scrieInfo("--- Selecteaza produs ---"); std::cout << "\n";
-            int pid = alegereProdus();
-            std::cout << "\n  Cantitate iesita: "; int cant; std::cin >> cant;
+            std::cout << "\n";
+            Consola::scrieInfo("--- Selecteaza produs ---");
+            std::cout << "\n";
+            int pid  = alegereProdus();
+            int cant = Consola::readInt("Cantitate iesita: ", 1);
             depozit.iesireMarfa(pid, cant, sid, vid, dest);
         } else { // FEFO
-            std::cout << "  Nume produs perisabil: ";
-            std::string n; std::getline(std::cin, n);
-            std::cout << "  Cantitate: "; int cant; std::cin >> cant;
+            std::string n = Consola::readString("Nume produs perisabil: ");
+            int cant      = Consola::readInt   ("Cantitate: ", 1);
             depozit.iesireMarfaFEFO(n, cant, sid, vid, dest);
         }
         Consola::sunetOK();
@@ -369,7 +366,7 @@ void UI::menuRapoarte() const {
             "[1] Produse sub prag de alerta",
             "[2] Produse expirate",
             "[3] Produse care expira curand",
-            "[4] Recomandare recomandare",
+            "[4] Recomandare reaprovizionare",
             "[5] Istoric tranzactii",
             "[6] Test performanta (1 milion produse)",
             "[0] Inapoi"
@@ -383,7 +380,8 @@ void UI::menuRapoarte() const {
             if (lista.empty()) Consola::scrieOK("Toate produsele sunt peste prag.");
             else {
                 afisareTabelProduse(lista);
-                std::cout << "\n  "; Consola::scrie(std::to_string(lista.size()) + " produse sub prag.", C::GALBEN);
+                std::cout << "\n  ";
+                Consola::scrie(std::to_string(lista.size()) + " produse sub prag.", C::GALBEN);
                 std::cout << "\n";
             }
         } else if (idx == 1) {
@@ -392,17 +390,19 @@ void UI::menuRapoarte() const {
             if (lista.empty()) Consola::scrieOK("Niciun produs expirat.");
             else {
                 afisareTabelProduse(lista);
-                std::cout << "\n  "; Consola::scrie(std::to_string(lista.size()) + " produse expirate!", C::ROSU);
+                std::cout << "\n  ";
+                Consola::scrie(std::to_string(lista.size()) + " produse expirate!", C::ROSU);
                 std::cout << "\n";
             }
         } else if (idx == 2) {
-            std::cout << "  Expira in cate zile? "; int n; std::cin >> n;
-            Consola::curata(); Consola::titlu("EXPIRA IN " + std::to_string(n) + " ZILE");
+            int n = Consola::readInt("Expira in cate zile? ", 1, 3650);
+            Consola::curata();
+            Consola::titlu("EXPIRA IN " + std::to_string(n) + " ZILE");
             afisareTabelProduse(depozit.getProduseExpiraCurand(n));
         } else if (idx == 3) {
-            Consola::titlu("RECOMANDARE RECOMANDARE");
+            Consola::titlu("RECOMANDARE REAPROVIZIONARE");
             auto lista = depozit.getRecomandare();
-            if (lista.empty()) Consola::scrieOK("Niciun produs nu necesita recomandare.");
+            if (lista.empty()) Consola::scrieOK("Niciun produs nu necesita reaprovizionare.");
             else {
                 Consola::scrieAtentie("Sortate dupa cantitate ramasa (cele mai urgente primele):\n");
                 afisareTabelProduse(lista);
@@ -410,8 +410,9 @@ void UI::menuRapoarte() const {
         } else if (idx == 4) {
             Consola::titlu("ISTORIC TRANZACTII");
             const auto& ist = depozit.getIstoric();
-            if (ist.empty()) { Consola::scrieInfo("Nicio tranzactie inregistrata."); }
-            else {
+            if (ist.empty()) {
+                Consola::scrieInfo("Nicio tranzactie inregistrata.");
+            } else {
                 Consola::culoare(C::CYAN);
                 std::cout << std::left
                           << std::setw(10) << "TIP"
@@ -446,12 +447,16 @@ void UI::menuRapoarte() const {
             long long ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now() - start).count();
 
-            std::cout << "  Inserare 1M produse : "; Consola::scrieLn(std::to_string(ms) + " ms", C::GALBEN);
+            std::cout << "  Inserare 1M produse : ";
+            Consola::scrieLn(std::to_string(ms) + " ms", C::GALBEN);
+
             start = std::chrono::high_resolution_clock::now();
             testD.cautaDupaId(500000);
             long long us = std::chrono::duration_cast<std::chrono::microseconds>(
                 std::chrono::high_resolution_clock::now() - start).count();
-            std::cout << "  Cautare ID 500000   : "; Consola::scrieLn(std::to_string(us) + " microsecunde (O(1))", C::VERDE);
+            std::cout << "  Cautare ID 500000   : ";
+            Consola::scrieLn(std::to_string(us) + " microsecunde (O(1))", C::VERDE);
+            // testD iese din scope → destructor elibereaza toate cele 1M obiecte
         } else {
             activ = false; continue;
         }
@@ -465,7 +470,10 @@ void UI::menuExport() const {
     Consola::curata();
     Consola::titlu("EXPORT DATE");
     time_t now = time(nullptr);
-    char buf[12]; strftime(buf, sizeof(buf), "%Y%m%d", localtime(&now));
+    char buf[12];
+    struct tm tmbuf;
+    localtime_s(&tmbuf, &now);
+    strftime(buf, sizeof(buf), "%Y%m%d", &tmbuf);
     std::string data(buf);
     FileManager::exportStoc(depozit, "data/stoc_" + data + ".csv");
     FileManager::exportIstoric(depozit, "data/tranzactii_" + data + ".csv");
@@ -493,7 +501,7 @@ void UI::menuSoferiVehicule() {
         int idx = Consola::meniu(opts);
         Consola::curata();
         try {
-            if      (idx == 0) { Consola::titlu("SOFERI");         depozit.afisareSoferi(); }
+            if      (idx == 0) { Consola::titlu("SOFERI");       depozit.afisareSoferi(); }
             else if (idx == 1) {
                 Consola::titlu("ADAUGA SOFER");
                 Sofer* s = introduceSofer();
@@ -502,7 +510,7 @@ void UI::menuSoferiVehicule() {
                 Consola::scrieOK("Sofer adaugat cu ID " + std::to_string(s->getId()));
                 FileManager::salveazaSoferiVehicule(depozit);
             }
-            else if (idx == 2) { Consola::titlu("VEHICULE");        depozit.afisareVehicule(); }
+            else if (idx == 2) { Consola::titlu("VEHICULE");     depozit.afisareVehicule(); }
             else if (idx == 3) {
                 Consola::titlu("ADAUGA VEHICUL");
                 Vehicul* v = introduceVehicul();
@@ -511,7 +519,7 @@ void UI::menuSoferiVehicule() {
                 Consola::scrieOK("Vehicul adaugat cu ID " + std::to_string(v->getId()));
                 FileManager::salveazaSoferiVehicule(depozit);
             }
-            else if (idx == 4) { Consola::titlu("STAFF DEPOZIT");   depozit.afisareStaff(); }
+            else if (idx == 4) { Consola::titlu("STAFF DEPOZIT"); depozit.afisareStaff(); }
             else if (idx == 5) {
                 Consola::titlu("ADAUGA STAFF");
                 StaffDepozit* s = introduceStaff();
@@ -544,8 +552,10 @@ void UI::menuFurnizori() {
         int idx = Consola::meniu(opts);
         Consola::curata();
         try {
-            if (idx == 0) { Consola::titlu("FURNIZORI"); depozit.afisareFurnizori(); }
-            else if (idx == 1) {
+            if (idx == 0) {
+                Consola::titlu("FURNIZORI");
+                depozit.afisareFurnizori();
+            } else if (idx == 1) {
                 Consola::titlu("ADAUGA FURNIZOR");
                 Furnizor* f = introduceFurnizor();
                 depozit.adaugaFurnizor(f);
@@ -553,13 +563,15 @@ void UI::menuFurnizori() {
                 Consola::scrieOK("Furnizor adaugat cu ID " + std::to_string(f->getId()));
             } else if (idx == 2) {
                 depozit.afisareFurnizori();
-                std::cout << "\n  ID furnizor: "; int fid; std::cin >> fid;
-                std::cout << "  ID produs: ";    int pid; std::cin >> pid;
-                depozit.cautaDupaId(pid);
+                int fid = Consola::readInt("ID furnizor: ");
+                int pid = Consola::readInt("ID produs: ");
+                depozit.cautaDupaId(pid); // valideaza existenta produsului
                 depozit.cautaFurnizor(fid)->adaugaProdusAsociat(pid);
                 Consola::sunetOK();
                 Consola::scrieOK("Produs asociat furnizorului.");
-            } else { activ = false; continue; }
+            } else {
+                activ = false; continue;
+            }
         } catch (const DepozitException& e) {
             Consola::sunetEroare();
             Consola::scrieEroare(e.what());
@@ -593,14 +605,14 @@ void UI::run() {
         int idx = Consola::meniu(optsMain);
 
         switch (idx) {
-            case 0: menuProduse();         break;
-            case 1: menuIntrareMarfa();    break;
-            case 2: menuIesireMarfa();     break;
-            case 3: menuSoferiVehicule();  break;
-            case 4: menuFurnizori();       break;
-            case 5: menuRapoarte();        break;
-            case 6: menuExport();          break;
-            case 7: activ = false;         break;
+            case 0: menuProduse();        break;
+            case 1: menuIntrareMarfa();   break;
+            case 2: menuIesireMarfa();    break;
+            case 3: menuSoferiVehicule(); break;
+            case 4: menuFurnizori();      break;
+            case 5: menuRapoarte();       break;
+            case 6: menuExport();         break;
+            case 7: activ = false;        break;
         }
     }
 

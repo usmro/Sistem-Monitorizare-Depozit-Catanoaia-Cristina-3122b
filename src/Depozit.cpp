@@ -20,7 +20,9 @@ Depozit::~Depozit() {
 std::string Depozit::timestampCurent() const {
     time_t now = time(nullptr);
     char buf[20];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", localtime(&now));
+    struct tm tmbuf;
+    localtime_s(&tmbuf, &now);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmbuf);
     return std::string(buf);
 }
 

@@ -1,5 +1,5 @@
 CXX      = "C:/Program Files/CodeBlocks/MinGW/bin/g++"
-CXXFLAGS = -std=c++17 -Wall -Wextra
+CXXFLAGS = -std=c++17 -Wall -Wextra -static-libgcc -static-libstdc++ -static
 
 SRCS = main.cpp \
        src/Produs.cpp \

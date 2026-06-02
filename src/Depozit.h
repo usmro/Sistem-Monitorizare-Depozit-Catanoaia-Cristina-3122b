@@ -55,6 +55,7 @@ public:
     std::vector<Produs*> getProduseExpirate() const;
     std::vector<Produs*> getProduseExpiraCurand(int nZile = 7) const;
     std::vector<Produs*> getRecomandare() const; // sub prag, sortate dupa cantitate
+    std::vector<Produs*> cauta(const std::string& query) const; // cautare unificata
     void     afisareToate() const;
     void     afisareTabelHeader() const;
     int      getNextProdusId() { return nextProdusId; }
@@ -97,6 +98,7 @@ public:
     int    getProduseExpirateCount()  const;
     double getValoareTotalaStoc()     const;
     int    getTranzactiiCount()       const;
+    int    getTranzactiiAziCount()    const;
     const  EntryTranzactie* getUltimaIntrare() const;
     const  EntryTranzactie* getUltimaIesire()  const;
 

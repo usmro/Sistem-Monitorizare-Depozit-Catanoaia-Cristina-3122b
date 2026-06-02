@@ -6,6 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <set>
 #include <ctime>
 
 Depozit::~Depozit() {
@@ -118,6 +119,53 @@ std::vector<Produs*> Depozit::getRecomandare() const {
         return a->getCantitate() < b->getCantitate();
     });
     return rez;
+}
+
+std::vector<Produs*> Depozit::cauta(const std::string& query) const {
+    // Cauta simultan dupa: ID numeric, nume (partial), ISBN exact, serie exacta, locatie exacta
+    std::vector<Produs*> rezultate;
+    std::set<int> vazute; // evita duplicate
+
+    auto adauga = [&](Produs* p) {
+        if (p && vazute.find(p->getId()) == vazute.end()) {
+            rezultate.push_back(p);
+            vazute.insert(p->getId());
+        }
+    };
+
+    // 1. Dupa ID numeric
+    try {
+        int id = std::stoi(query);
+        auto it = produse.find(id);
+        if (it != produse.end()) adauga(it->second);
+    } catch (...) {}
+
+    // 2. Dupa nume (case-insensitive, partial)
+    std::string q = query;
+    std::transform(q.begin(), q.end(), q.begin(), ::tolower);
+    for (auto& kv : produse) {
+        std::string n = kv.second->getNume();
+        std::transform(n.begin(), n.end(), n.begin(), ::tolower);
+        if (n.find(q) != std::string::npos) adauga(kv.second);
+    }
+
+    // 3. Dupa ISBN
+    for (auto& kv : produse) {
+        auto* pi = dynamic_cast<ProdusISBN*>(kv.second);
+        if (pi && pi->getIsbn() == query) adauga(pi);
+    }
+
+    // 4. Dupa serie electronica
+    for (auto& kv : produse) {
+        auto* pe = dynamic_cast<ProdusElectronic*>(kv.second);
+        if (pe && pe->getSerie() == query) adauga(pe);
+    }
+
+    // 5. Dupa locatie exacta
+    for (auto& kv : produse)
+        if (kv.second->getLocatie() == query) adauga(kv.second);
+
+    return rezultate;
 }
 
 void Depozit::afisareTabelHeader() const {
@@ -296,6 +344,17 @@ void Depozit::afisareFurnizori() const {
 
 int Depozit::getTotalProduse()         const { return (int)produse.size(); }
 int Depozit::getTranzactiiCount()      const { return (int)istoricTranzactii.size(); }
+
+int Depozit::getTranzactiiAziCount() const {
+    time_t now = time(nullptr);
+    char buf[11];
+    strftime(buf, sizeof(buf), "%Y-%m-%d", localtime(&now));
+    std::string azi(buf);
+    int cnt = 0;
+    for (auto& t : istoricTranzactii)
+        if (t.timestamp.substr(0, 10) == azi) cnt++;
+    return cnt;
+}
 
 int Depozit::getProduseSuBPragCount() const {
     int c = 0;

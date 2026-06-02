@@ -30,8 +30,10 @@ Produs* FileManager::produsFromCSV(const std::string& line) {
 
         if (tip == "perisabil" && f.size() >= 10)
             return new ProdusPerisabil(id, nume, cant, pret, prag, loc, f[8], std::stod(f[9]));
-        if (tip == "electronic" && f.size() >= 10)
-            return new ProdusElectronic(id, nume, cant, pret, prag, loc, f[8], std::stoi(f[9]));
+        if (tip == "electronic" && f.size() >= 10) {
+            double volt = (f.size() >= 11) ? std::stod(f[10]) : 220.0;
+            return new ProdusElectronic(id, nume, cant, pret, prag, loc, f[8], std::stoi(f[9]), volt);
+        }
         if (tip == "isbn" && f.size() >= 12)
             return new ProdusISBN(id, nume, cant, pret, prag, loc, f[8], f[9], f[10], std::stoi(f[11]));
         return new Produs(id, nume, cant, pret, prag, loc);

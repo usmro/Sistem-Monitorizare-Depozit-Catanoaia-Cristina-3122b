@@ -50,11 +50,14 @@ void UI::dashboard() const {
     int    tranz    = depozit.getTranzactiiCount();
 
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "  Total produse stocate   : " << total   << "\n";
+    int tranzAzi = depozit.getTranzactiiAziCount();
+
+    std::cout << "  Total produse stocate   : " << total    << "\n";
     std::cout << "  Produse sub prag alerta : " << subPrag  << (subPrag  > 0 ? "  [!]" : "") << "\n";
     std::cout << "  Produse expirate        : " << expirate << (expirate > 0 ? "  [X]" : "") << "\n";
     std::cout << "  Valoare totala stoc     : " << valoare  << " RON\n";
-    std::cout << "  Tranzactii inregistrate : " << tranz    << "\n";
+    std::cout << "  Tranzactii azi          : " << tranzAzi << "\n";
+    std::cout << "  Tranzactii total        : " << tranz    << "\n";
     linie();
     auto ui = depozit.getUltimaIntrare();
     auto ue = depozit.getUltimaIesire();
@@ -177,7 +180,7 @@ void UI::menuProduse() {
         clearScreen();
         titlu("GESTIONARE PRODUSE");
         std::cout << "  [1] Vizualizare toate\n"
-                  << "  [2] Cauta dupa ID\n"
+                  << "  [2] Cautare rapida (ID / nume / ISBN / serie / locatie)\n"
                   << "  [3] Cauta dupa nume\n"
                   << "  [4] Cauta dupa ISBN\n"
                   << "  [5] Cauta dupa numar serie\n"
@@ -192,9 +195,14 @@ void UI::menuProduse() {
                 titlu("TOATE PRODUSELE");
                 depozit.afisareToate();
             } else if (opt == 2) {
-                std::cout << "  ID produs: "; int id; std::cin >> id;
-                titlu("REZULTAT");
-                depozit.cautaDupaId(id)->afisare();
+                std::cin.ignore();
+                std::cout << "  Cauta (ID / cuvant / ISBN / serie / locatie): ";
+                std::string q; std::getline(std::cin, q);
+                auto rez = depozit.cauta(q);
+                titlu("REZULTATE CAUTARE: \"" + q + "\"");
+                if (rez.empty()) std::cout << "  Niciun rezultat.\n";
+                else { depozit.afisareTabelHeader(); for (auto* p : rez) p->afisare();
+                       std::cout << "\n  " << rez.size() << " rezultat(e).\n"; }
             } else if (opt == 3) {
                 std::cin.ignore();
                 std::cout << "  Termen cautare: "; std::string q; std::getline(std::cin, q);

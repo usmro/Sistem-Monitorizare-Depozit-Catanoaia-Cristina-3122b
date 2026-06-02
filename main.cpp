@@ -1,92 +1,40 @@
+#include "src/Depozit.h"
+#include "src/UI.h"
+#include "src/FileManager.h"
+#include "src/ProdusPerisabil.h"
+#include "src/ProdusElectronic.h"
+#include "src/ProdusISBN.h"
 #include <iostream>
-#include <map>
-#include <string>
-
-using namespace std;
-
-class Entitate {
-public:
-    int id;
-
-    Entitate(int idNou = 0) {
-        id = idNou;
-    }
-};
-
-class Produs : public Entitate {
-public:
-    string nume;
-    int cantitate;
-    double pret;
-
-    Produs() : Entitate(0) {
-        nume = "";
-        cantitate = 0;
-        pret = 0;
-    }
-
-    Produs(int idNou, string numeNou, int cantitateNoua, double pretNou)
-        : Entitate(idNou) {
-        nume = numeNou;
-        cantitate = cantitateNoua;
-        pret = pretNou;
-    }
-};
-
-class Depozit {
-private:
-    map<int, Produs> produse;
-
-public:
-    void adaugaProdus(Produs p) {
-        if (produse.find(p.id) != produse.end()) {
-            cout << "Produsul cu ID " << p.id << " exista deja.\n";
-            return;
-        }
-        produse[p.id] = p;
-        cout << "Produs adaugat: " << p.nume << "\n";
-    }
-
-    void eliminaProdus(int id) {
-        if (produse.find(id) == produse.end()) {
-            cout << "Nu exista produs cu ID " << id << "\n";
-            return;
-        }
-        produse.erase(id);
-        cout << "Produs eliminat cu ID " << id << "\n";
-    }
-
-    void afisareToate() {
-        cout << "\nToate produsele:\n";
-        if (produse.empty()) {
-            cout << "Depozitul este gol.\n";
-            return;
-        }
-
-        map<int, Produs>::iterator it;
-        for (it = produse.begin(); it != produse.end(); ++it) {
-            cout << "ID " << it->second.id
-                 << " nume" << it->second.nume
-                 << " cantitate " << it->second.cantitate
-                 << " pret " << it->second.pret << "\n";
-        }
-    }
-};
 
 int main() {
-    Depozit d;
+    Depozit depozit;
 
-    d.adaugaProdus(Produs(1, "Lapte", 20, 8.5));
-    d.adaugaProdus(Produs(2, "Paine", 5, 4));
-    d.adaugaProdus(Produs(3, "Orez", 40, 12));
+    // Incarcare date salvate anterior
+    FileManager::incarcaStoc(depozit);
+    FileManager::incarcaSoferiVehicule(depozit);
 
-    d.afisareToate();
+    // Date demo daca depozitul e gol (primul start)
+    if (depozit.getTotalProduse() == 0) {
+        depozit.adaugaProdus(new ProdusPerisabil(1, "Lapte UHT 1L",   200, 8.50,  30, "A-01-01", "2026-09-01", 4.0));
+        depozit.adaugaProdus(new ProdusPerisabil(2, "Iaurt 400g",      80, 5.20,  20, "A-01-02", "2026-07-15", 4.0));
+        depozit.adaugaProdus(new Produs         (3, "Orez 1kg",       150, 12.00, 25, "B-02-01"));
+        depozit.adaugaProdus(new Produs         (4, "Zahar 1kg",       90, 10.50, 15, "B-02-02"));
+        depozit.adaugaProdus(new ProdusElectronic(5,"Laptop Dell 15", 10, 3299.99, 2, "C-01-01", "SN-DELL-001", 24));
+        depozit.adaugaProdus(new ProdusElectronic(6,"Mouse Logitech",  25, 149.99, 5, "C-01-02", "SN-LOG-055",  12));
+        depozit.adaugaProdus(new ProdusISBN      (7,"C++ Primer",      12,  89.99, 3, "D-01-01",
+                                                   "9780321714114", "Lippman", "Addison-Wesley", 2012));
 
-    d.eliminaProdus(2);
+        depozit.adaugaSofer(new Sofer  (1, "Ion Popescu",   "B-123456", "C"));
+        depozit.adaugaSofer(new Sofer  (2, "Maria Ionescu", "B-654321", "B"));
+        depozit.adaugaVehicul(new Vehicul(1, "B-01-ABC", 5000, "camion"));
+        depozit.adaugaVehicul(new Vehicul(2, "B-02-XYZ", 1200, "utilitara"));
 
-    d.afisareToate();
+        FileManager::salveazaStoc(depozit);
+        FileManager::salveazaSoferiVehicule(depozit);
+    }
 
-    d.eliminaProdus(99);
+    UI ui(depozit);
+    ui.run();
 
     return 0;
 }

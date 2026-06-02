@@ -2,17 +2,21 @@
 #include "Depozit.h"
 #include "StaffDepozit.h"
 #include "Furnizor.h"
+#include "Consola.h"
 #include <string>
 
 class UI {
 private:
     Depozit& depozit;
 
-    void clearScreen() const;
     void pauza() const;
-    void linie(int w = 60) const;
-    void titlu(const std::string& text) const;
 
+    // Afisare tabel colorat
+    void afisareProdus(Produs* p) const;
+    void afisareTabelProduse(const std::vector<Produs*>& lista) const;
+    void afisareTabelToate() const;
+
+    // Sub-meniuri
     void dashboard() const;
     void menuProduse();
     void menuIntrareMarfa();
@@ -22,14 +26,15 @@ private:
     void menuSoferiVehicule();
     void menuFurnizori();
 
+    // Helpers introducere date
     Produs*       introduceProdus();
     Sofer*        introduceSofer();
     Vehicul*      introduceVehicul();
     StaffDepozit* introduceStaff();
     Furnizor*     introduceFurnizor();
-    int alegereSofer()  const;
-    int alegeVehicul()  const;
-    int alegereProdus() const;
+    int           alegereProdus() const;
+    int           alegereSofer()  const;
+    int           alegeVehicul()  const;
 
 public:
     explicit UI(Depozit& d) : depozit(d) {}

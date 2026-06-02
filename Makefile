@@ -12,7 +12,8 @@ SRCS = main.cpp \
        src/Furnizor.cpp \
        src/Depozit.cpp \
        src/UI.cpp \
-       src/FileManager.cpp
+       src/FileManager.cpp \
+       src/Consola.cpp
 
 TARGET = depozit.exe
 

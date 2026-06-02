@@ -4,7 +4,7 @@
 
 Sofer::Sofer(int id, const std::string& nume, const std::string& nrPermis,
              const std::string& categorie)
-    : Entitate(id), nume(nume), nrPermis(nrPermis), categorie(categorie) {}
+    : Persoana(id, nume), nrPermis(nrPermis), categorie(categorie) {}
 
 void Sofer::afisare() const {
     std::cout << std::left

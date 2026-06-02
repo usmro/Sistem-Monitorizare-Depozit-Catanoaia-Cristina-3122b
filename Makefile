@@ -7,7 +7,9 @@ SRCS = main.cpp \
        src/ProdusElectronic.cpp \
        src/ProdusISBN.cpp \
        src/Sofer.cpp \
+       src/StaffDepozit.cpp \
        src/Vehicul.cpp \
+       src/Furnizor.cpp \
        src/Depozit.cpp \
        src/UI.cpp \
        src/FileManager.cpp
@@ -25,8 +27,8 @@ run: all
 test:
 	$(CXX) $(CXXFLAGS) tests/test_depozit.cpp \
 	    src/Produs.cpp src/ProdusPerisabil.cpp src/ProdusElectronic.cpp \
-	    src/ProdusISBN.cpp src/Sofer.cpp src/Vehicul.cpp \
-	    src/Depozit.cpp src/FileManager.cpp \
+	    src/ProdusISBN.cpp src/Sofer.cpp src/StaffDepozit.cpp src/Vehicul.cpp \
+	    src/Furnizor.cpp src/Depozit.cpp src/FileManager.cpp \
 	    -o test_depozit.exe
 	./test_depozit.exe
 

@@ -1,5 +1,7 @@
 #pragma once
 #include "Depozit.h"
+#include "StaffDepozit.h"
+#include "Furnizor.h"
 #include <string>
 
 class UI {
@@ -8,10 +10,9 @@ private:
 
     void clearScreen() const;
     void pauza() const;
-    void linie(int latime = 60) const;
+    void linie(int w = 60) const;
     void titlu(const std::string& text) const;
 
-    // Sub-meniuri
     void dashboard() const;
     void menuProduse();
     void menuIntrareMarfa();
@@ -19,14 +20,16 @@ private:
     void menuRapoarte() const;
     void menuExport() const;
     void menuSoferiVehicule();
+    void menuFurnizori();
 
-    // Helpers introducere date
-    Produs*  introduceProdus();
-    Sofer*   introduceSofer();
-    Vehicul* introduceVehicul();
-    int      alegereSofer() const;
-    int      alegeVehicul() const;
-    int      alegereProdus() const;
+    Produs*       introduceProdus();
+    Sofer*        introduceSofer();
+    Vehicul*      introduceVehicul();
+    StaffDepozit* introduceStaff();
+    Furnizor*     introduceFurnizor();
+    int alegereSofer()  const;
+    int alegeVehicul()  const;
+    int alegereProdus() const;
 
 public:
     explicit UI(Depozit& d) : depozit(d) {}
